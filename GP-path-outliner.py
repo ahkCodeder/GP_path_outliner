@@ -33,6 +33,9 @@ MODES ::
 """
 MODE = "DEFAULT"
 
+# OUTPUTS IT INTO A GREASE PENCIL WITH ONE LAYER THAT CAN BE ANIMATED ON EASYLY
+turn_default_into_one_animatable_object = True
+
 # THIS ADDS MORE POINTS ONTO THE GP OUTPUT OBJECT 
 add_subdivision = False
 
@@ -129,30 +132,51 @@ if MODE == "DEFAULT":
 
         obj.hide_render = False
         obj.keyframe_insert("hide_render")
-
-        try:
-            obj.select_set(True)
-            obj.keyframe_insert(bpy.ops.transform.translate(value=(0, 0, 0),orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
-        except:
-            obj.select_set(False)
-            print("keyfram failed")
-
-        if not obj == prev_obj:
-
-            prev_obj.hide_render = True
-            prev_obj.keyframe_insert("hide_render")
-
+        
+        if not turn_default_into_one_animatable_object: 
             try:
-                prev_obj.select_set(True)
-                prev_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                obj.select_set(True)
+                obj.keyframe_insert(bpy.ops.transform.translate(value=(0, 0, 0),orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
             except:
-                prev_obj.select_set(False)
-                print("keyframe failed")
+                obj.select_set(False)
+                print("keyfram failed")
 
-        prev_obj = obj
+            if not obj == prev_obj:
+
+                prev_obj.hide_render = True
+                prev_obj.keyframe_insert("hide_render")
+
+                try:
+                    prev_obj.select_set(True)
+                    prev_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                except:
+                    prev_obj.select_set(False)
+                    print("keyframe failed")
+
+            prev_obj = obj
+        
+        else:
+
+            if not obj == prev_obj:
+
+                prev_obj.hide_render = True
+                prev_obj.keyframe_insert("hide_render") 
+
+            prev_obj = obj
 
 
         bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+        
+    if turn_default_into_one_animatable_object: 
+        for obj in D.collections[output_collection].objects:
+            obj.select_set(True)
+        
+        bpy.ops.object.join()
+        
+        D.scenes[0].frame_current = start_frame
+        GP_name = D.collections[output_collection].objects[0].name_full
+        D.grease_pencils[GP_name].layers[0].select = True
+        bpy.ops.gpencil.layer_merge(mode='ALL')
         
 if MODE == "TRACE_1":
     with C.temp_override(window=window,area=area,region=region):

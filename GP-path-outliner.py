@@ -76,12 +76,6 @@ D = bpy.data
 
 D.scenes[0].frame_current = start_frame
 
-area_type = "OUTLINER"
-area = [area for area in C.screen.areas if area.type == area_type][0]
-
-window = C.window_manager.windows[0]
-region = area.regions[-1]
-
 area_type = "PROPERTIES"
 area = [area for area in C.screen.areas if area.type == area_type][0]
 

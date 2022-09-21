@@ -88,12 +88,14 @@ def config_and_draw(GP_obj):
     D.objects[GP_obj].select_set(True)
         
     D.objects[GP_obj].active_material_index = 0
-    D.objects[GP_obj].active_material.name = "Black"
+    target_material_name = output_collection + "_" + color 
+    D.objects[GP_obj].active_material.name = target_material_name
+    target_material_name = D.objects[GP_obj].active_material.name
         
     bpy.ops.object.gpencil_modifier_add(type='GP_LINEART')
     D.objects[GP_obj].grease_pencil_modifiers['Line Art'].source_type = 'SCENE'
     D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_layer = "GP_Layer"
-    D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_material = bpy.data.materials["Black"]
+    D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_material = bpy.data.materials[target_material_name]
     D.objects[GP_obj].grease_pencil_modifiers["Line Art"].thickness = stroke_thickness
     D.objects[GP_obj].grease_pencil_modifiers["Line Art"].opacity = stroke_opacity
     bpy.ops.object.gpencil_modifier_apply(modifier="Line Art")

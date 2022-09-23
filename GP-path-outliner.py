@@ -39,6 +39,10 @@ turn_default_into_one_animatable_object = True
 # THIS ADDS MORE POINTS ONTO THE GP OUTPUT OBJECT 
 add_subdivision = False
 
+# THIS DOSNT WORK WITH turn_default_into_one_animatable_object = True unless its set to 0
+# THE AMOMUNT OF LAGG EFFECT 
+lagg_effect_amount = 7
+
 # TIP :: START LOWEST THEN GO HIGHER IF YOU NEED MORE 
 #this gose from 1-5 subdivision amount higher is more and takes more time and harder to run 
 subdivison_level = 1
@@ -121,7 +125,11 @@ if MODE == "DEFAULT":
 
     prev_obj = D.collections[output_collection].objects[0]
 
+    lagg_obj = []
+    
     for obj in D.collections[output_collection].objects:
+        
+        lagg_obj.append(obj)
         
         C.view_layer.objects.active = D.objects[obj.name_full]
         C.object.active_material.grease_pencil.color = color
@@ -138,16 +146,19 @@ if MODE == "DEFAULT":
                 obj.select_set(False)
                 print("keyfram failed")
 
-            if not obj == prev_obj:
+            if (not (obj == prev_obj)) and lagg_effect_amount < len(lagg_obj) - 1:
 
-                prev_obj.hide_render = True
-                prev_obj.keyframe_insert("hide_render")
-
+                re_obj = lagg_obj.pop(0)
+                re_obj.select_set(True)
+                re_obj.hide_render = True
+                re_obj.keyframe_insert("hide_render") 
+                re_obj.select_set(False)
+                
                 try:
-                    prev_obj.select_set(True)
-                    prev_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                    re_obj.select_set(True)
+                    re_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
                 except:
-                    prev_obj.select_set(False)
+                    re_obj.select_set(False)
                     print("keyframe failed")
 
             prev_obj = obj
@@ -163,7 +174,23 @@ if MODE == "DEFAULT":
 
 
         bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+    
+    if not turn_default_into_one_animatable_object:
+        for obj in D.collections['g'].objects:
         
+            obj.select_set(True)
+        
+            area_type = "DOPESHEET_EDITOR"
+            area = [area for area in C.screen.areas if area.type == area_type][0]
+
+            window = C.window_manager.windows[0]
+            region = area.regions[-1]
+            with C.temp_override(window=window,area=area,region=region):
+            
+                bpy.ops.action.interpolation_type(type='CONSTANT')
+
+            obj.select_set(False)
+    
     if turn_default_into_one_animatable_object: 
         for obj in D.collections[output_collection].objects:
             obj.select_set(True)

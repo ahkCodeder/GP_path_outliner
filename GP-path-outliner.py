@@ -170,7 +170,7 @@ if MODE == "DEFAULT":
         
         bpy.ops.object.join()
         
-        D.scenes[0].frame_current = start_frame
+        D.scenes[0].frame_current = -1
         GP_name = D.collections[output_collection].objects[0].name_full
         D.grease_pencils[GP_name].layers[0].select = True
         bpy.ops.gpencil.layer_merge(mode='ALL')

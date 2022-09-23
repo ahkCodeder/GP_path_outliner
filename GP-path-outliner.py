@@ -61,11 +61,8 @@ output_collection = "g"
 # MOVES THE STROKES AWAY FROM THE VIEW PRORT IN ANIMATION 
 away_from_frame_distance = (0,0,10000000000000000)
 
-# Default color name 
-color = "Black"
-
-# name for the grease pencil object being created 'GPencil' is the first one if that one exist new once might be 'GPencil.001' or 'GPencil.002' or more
-#GP_obj = 'GPencil'
+#Default color name SHOUDL BE A (R;G;B;A)
+color = (0.02,1,0,1)
 
 """ 
 VARIABLES END
@@ -88,7 +85,7 @@ def config_and_draw(GP_obj):
     D.objects[GP_obj].select_set(True)
         
     D.objects[GP_obj].active_material_index = 0
-    target_material_name = output_collection + "_" + color 
+    target_material_name = output_collection
     D.objects[GP_obj].active_material.name = target_material_name
     target_material_name = D.objects[GP_obj].active_material.name
         
@@ -125,7 +122,11 @@ if MODE == "DEFAULT":
     prev_obj = D.collections[output_collection].objects[0]
 
     for obj in D.collections[output_collection].objects:
-
+        
+        C.view_layer.objects.active = D.objects[obj.name_full]
+        C.object.active_material.grease_pencil.color = color
+        C.view_layer.objects.active = None
+        
         obj.hide_render = False
         obj.keyframe_insert("hide_render")
         

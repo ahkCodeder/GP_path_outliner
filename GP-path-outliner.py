@@ -195,6 +195,8 @@ if MODE == "DEFAULT":
         for obj in D.collections[output_collection].objects:
             obj.select_set(True)
         
+        C.view_layer.objects.active = D.collections[output_collection].objects[0]
+        
         bpy.ops.object.join()
         
         D.scenes[0].frame_current = -1

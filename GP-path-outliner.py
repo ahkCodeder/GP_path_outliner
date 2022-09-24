@@ -68,6 +68,9 @@ away_from_frame_distance = (0,0,10000000000000000)
 #Default color name SHOUDL BE A (R;G;B;A)
 color = (0.02,1,0,1)
 
+# on's this will be sett to on 1's by default for the smoothest animations
+frame_ons =  1
+
 """ 
 VARIABLES END
 """
@@ -119,7 +122,7 @@ if MODE == "DEFAULT":
 
             bpy.ops.object.gpencil_modifier_apply(modifier="Line Art")
 
-            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
 
     bpy.data.scenes[0].frame_current = start_frame
 
@@ -173,7 +176,7 @@ if MODE == "DEFAULT":
             prev_obj = obj
 
 
-        bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+        bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
     
     if not turn_default_into_one_animatable_object:
         for obj in D.collections['g'].objects:
@@ -219,7 +222,7 @@ if MODE == "TRACE_1":
         
             config_and_draw(GP_obj=GP_obj)
     
-            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
 
 if MODE == "TRACE_2":            
     with C.temp_override(window=window,area=area,region=region):
@@ -238,4 +241,4 @@ if MODE == "TRACE_2":
             
             config_and_draw(GP_obj=GP_obj)
     
-            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + 1
+            bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons

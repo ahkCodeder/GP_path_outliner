@@ -13,10 +13,10 @@ bl_info = {
 
 import bpy
 
-def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",trans_X=0,trans_Y=0,trans_Z=0,R=0,B=0,G=0,A=0,frame_ons = 1):
+def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",R=0,B=0,G=0,A=0,frame_ons = 1):
 
     # MOVES THE STROKES AWAY FROM THE VIEW PRORT IN ANIMATION 
-    away_from_frame_distance = (trans_X,trans_Y,trans_Z)
+    away_from_frame_distance = (0,0,10000000)
     
     #Default color name SHOUDL BE A (R;G;B;A)
     color = (R,G,B,A)
@@ -218,10 +218,6 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         
         col.prop(context.scene,'start_frame')
         col.prop(context.scene,'end_frame')
-       
-        col.prop(context.scene,'x_position',slider=True)
-        col.prop(context.scene,'y_position',slider=True)
-        col.prop(context.scene,'z_position',slider=True)
         
         col.prop(context.scene,'red_color')
         col.prop(context.scene,'green_color')
@@ -243,10 +239,6 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         props.end_frame = context.scene.end_frame
         
         props.output_collection = context.scene.output_collection
-        
-        props.x_position = context.scene.x_position
-        props.y_position = context.scene.y_position
-        props.z_position = context.scene.z_position
         
         props.red_color = context.scene.red_color
         props.green_color = context.scene.green_color
@@ -306,8 +298,7 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
                                 description="opacity storkes",
                                 default=1.0,
                                 min=0.0,
-                                max=1.0
-    )
+                                max=1.0)
     
     start_frame: bpy.props.IntProperty(
                                 name="start frame",
@@ -327,27 +318,6 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
                                     name="output collection",
                                     description="This sets the collection to output to",
                                     default="sdf")
-    
-    x_position: bpy.props.IntProperty(
-                                name="X position",
-                                description="This sets X direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
-    
-    y_position: bpy.props.IntProperty(
-                                name="Y position",
-                                description="This sets Y direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
-    
-    z_position: bpy.props.IntProperty(
-                                name="Z position",
-                                description="This sets Z direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
         
     red_color: bpy.props.FloatProperty(
                                 name="red color",
@@ -403,7 +373,6 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
             GP_outliner(MODE = self.MODE, turn_default_into_one_animatable_object = self.turn_default_into_one_animatable_object, add_subdivision = self.add_subdivision,
             lagg_effect_amount = self.lagg_effect_amount,fade_amount = self.fade_amount, subdivison_level = self.subdivison_level, stroke_thickness = self.stroke_thickness,
             stroke_opacity = self.stroke_opacity, start_frame = self.start_frame, end_frame = self.end_frame, output_collection = self.output_collection,
-            trans_X = self.x_position,trans_Y = self.y_position, trans_Z = self.z_position, 
             R = self.red_color, B = self.blue_color, G = self.green_color, A = self.alpha_color,
             frame_ons = self.frame_ons)
         
@@ -478,27 +447,6 @@ def register():
                                     name="output collection",
                                     description="This sets the collection to output to",
                                     default="sdf")
-    
-    bpy.types.Scene.x_position = bpy.props.IntProperty(
-                                name="X position",
-                                description="This sets X direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
-    
-    bpy.types.Scene.y_position = bpy.props.IntProperty(
-                                name="Y position",
-                                description="This sets Y direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
-    
-    bpy.types.Scene.z_position = bpy.props.IntProperty(
-                                name="Z position",
-                                description="This sets Z direction to translate the object away",
-                                default=1,
-                                min=-2000000000,
-                                max=2000000000)
         
     bpy.types.Scene.red_color = bpy.props.FloatProperty(
                                 name="red color",
@@ -561,12 +509,6 @@ def unregister():
     del bpy.types.Scene.end_frame 
     
     del bpy.types.Scene.output_collection 
-    
-    del bpy.types.Scene.x_position 
-    
-    del bpy.types.Scene.y_position 
-    
-    del bpy.types.Scene.z_position 
         
     del bpy.types.Scene.red_color 
                                 

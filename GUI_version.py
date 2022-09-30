@@ -386,21 +386,30 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
       
     @classmethod
     def poll(cls, context):   
+        if bpy.context.scene.start_frame >= bpy.context.scene.end_frame:
+            return False
+        
+        try:
+            bpy.data.collections[bpy.context.scene.output_collection]
+        except:
+            return False
+
         return True
     
     # SIMPLE JUST RUNS SOMETHING
     def execute(self, context):
         
-        GP_outliner(MODE = self.MODE, turn_default_into_one_animatable_object = self.turn_default_into_one_animatable_object, add_subdivision = self.add_subdivision,
-        lagg_effect_amount = self.lagg_effect_amount,fade_amount = self.fade_amount, subdivison_level = self.subdivison_level, stroke_thickness = self.stroke_thickness,
-        stroke_opacity = self.stroke_opacity, start_frame = self.start_frame, end_frame = self.end_frame, output_collection = self.output_collection,
-        trans_X = self.x_position,trans_Y = self.y_position, trans_Z = self.z_position, 
-        R = self.red_color, B = self.blue_color, G = self.green_color, A = self.alpha_color,
-        frame_ons = self.frame_ons)
+        if self.poll(self):
+            GP_outliner(MODE = self.MODE, turn_default_into_one_animatable_object = self.turn_default_into_one_animatable_object, add_subdivision = self.add_subdivision,
+            lagg_effect_amount = self.lagg_effect_amount,fade_amount = self.fade_amount, subdivison_level = self.subdivison_level, stroke_thickness = self.stroke_thickness,
+            stroke_opacity = self.stroke_opacity, start_frame = self.start_frame, end_frame = self.end_frame, output_collection = self.output_collection,
+            trans_X = self.x_position,trans_Y = self.y_position, trans_Z = self.z_position, 
+            R = self.red_color, B = self.blue_color, G = self.green_color, A = self.alpha_color,
+            frame_ons = self.frame_ons)
         
-        print("sdf")
+            return {'FINISHED'}
         
-        return {'FINISHED'}
+        return {'CANCELED'}
 
 def register():
     

@@ -51,7 +51,6 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
     window = C.window_manager.windows[0]
     region = area.regions[-1]
     
-    
     if MODE == "DEFAULT":
         with C.temp_override(window=window,area=area,region=region):
         
@@ -126,7 +125,7 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
             bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
             
         if not turn_default_into_one_animatable_object:
-            for obj in D.collections['g'].objects:
+            for obj in D.collections[output_collection].objects:
             
                 obj.select_set(True)
             
@@ -167,7 +166,7 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                     break
                 
                 bpy.ops.object.gpencil_add(align='WORLD', location=(0, 0, 0), scale=(1, 1, 1), type='EMPTY')
-                GP_obj = D.collections['g'].objects[-1].name_full
+                GP_obj = D.collections[output_collection].objects[-1].name_full
             
                 config_and_draw(GP_obj=GP_obj)
         

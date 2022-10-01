@@ -171,6 +171,12 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                 config_and_draw(GP_obj=GP_obj)
         
                 bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
+
+        for obj in D.collections[output_collection].objects:
+            
+            C.view_layer.objects.active = D.objects[obj.name_full]
+            C.object.active_material.grease_pencil.color = color
+            C.view_layer.objects.active = None
     
     if MODE == "TRACE_2":            
         with C.temp_override(window=window,area=area,region=region):
@@ -190,6 +196,12 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                 config_and_draw(GP_obj=GP_obj)
         
                 bpy.data.scenes[0].frame_current = bpy.data.scenes[0].frame_current + frame_ons
+        
+        for obj in D.collections[output_collection].objects:
+            
+            C.view_layer.objects.active = D.objects[obj.name_full]
+            C.object.active_material.grease_pencil.color = color
+            C.view_layer.objects.active = None
 
 class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
     

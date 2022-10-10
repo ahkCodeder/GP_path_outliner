@@ -13,7 +13,6 @@ bl_info = {
 
 import bpy
 
-def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",R=0,B=0,G=0,A=0,frame_ons = 1):
 
     # MOVES THE STROKES AWAY FROM THE VIEW PRORT IN ANIMATION 
     away_from_frame_distance = (0,0,10000000)
@@ -92,7 +91,15 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                 
                 try:
                     obj.select_set(True)
-                    obj.keyframe_insert(bpy.ops.transform.translate(value=(0, 0, 0),orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                    
+                    area_type = "DOPESHEET_EDITOR"
+                    area = [area for area in C.screen.areas if area.type == area_type][0]
+        
+                    window = C.window_manager.windows[0]
+                    region = area.regions[-1]
+                    with C.temp_override(window=window,area=area,region=region):
+                        obj.keyframe_insert(bpy.ops.transform.translate(value=(0, 0, 0),orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                
                 except:
                     obj.select_set(False)
                     print("keyfram failed")
@@ -102,12 +109,28 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                     re_obj = lagg_obj.pop(0)
                     re_obj.select_set(True)
                     re_obj.hide_render = True
-                    re_obj.keyframe_insert("hide_render") 
+                    
+                    area_type = "DOPESHEET_EDITOR"
+                    area = [area for area in C.screen.areas if area.type == area_type][0]
+        
+                    window = C.window_manager.windows[0]
+                    region = area.regions[-1]
+                    with C.temp_override(window=window,area=area,region=region):
+                        re_obj.keyframe_insert("hide_render") 
+                    
                     re_obj.select_set(False)
                     
                     try:
                         re_obj.select_set(True)
-                        re_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                        
+                        area_type = "DOPESHEET_EDITOR"
+                        area = [area for area in C.screen.areas if area.type == area_type][0]
+        
+                        window = C.window_manager.windows[0]
+                        region = area.regions[-1]
+                        with C.temp_override(window=window,area=area,region=region):
+                            re_obj.keyframe_insert(bpy.ops.transform.translate(value=away_from_frame_distance,orient_axis_ortho='X',orient_type='GLOBAL',orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),orient_matrix_type='GLOBAL',mirror=False, use_proportional_edit=False,proportional_edit_falloff='SMOOTH',proportional_size=1, use_proportional_connected=False,use_proportional_projected=False))
+                    
                     except:
                         re_obj.select_set(False)
                         print("keyframe failed")
@@ -118,7 +141,15 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
                 if not obj == prev_obj:#and lagg_effect_amount < len(lagg_obj):
                     
                     prev_obj.hide_render = True
-                    prev_obj.keyframe_insert("hide_render") 
+                    
+                    area_type = "DOPESHEET_EDITOR"
+                    area = [area for area in C.screen.areas if area.type == area_type][0]
+        
+                    window = C.window_manager.windows[0]
+                    region = area.regions[-1]
+                    
+                    with C.temp_override(window=window,area=area,region=region):
+                        prev_obj.keyframe_insert("hide_render") 
     
                 prev_obj = obj
     

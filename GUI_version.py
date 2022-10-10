@@ -13,6 +13,7 @@ bl_info = {
 
 import bpy
 
+def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",R=0,B=0,G=0,A=0,frame_ons = 1,crease_threshold = 3.14159):
 
     # MOVES THE STROKES AWAY FROM THE VIEW PRORT IN ANIMATION 
     away_from_frame_distance = (0,0,10000000)
@@ -38,7 +39,9 @@ import bpy
         bpy.ops.object.gpencil_modifier_add(type='GP_LINEART')
         D.objects[GP_obj].grease_pencil_modifiers['Line Art'].source_type = 'SCENE'
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_layer = "GP_Layer"
-    
+
+        D.objects[GP_obj].grease_pencil_modifiers["Line Art"].crease_threshold = crease_threshold
+
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_material = bpy.data.materials[target_material_name]
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].thickness = stroke_thickness
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].opacity = stroke_opacity
@@ -267,7 +270,8 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         col.prop(context.scene,'alpha_color')
         
         col.prop(context.scene,'frame_ons')
-        
+        col.prop(context.scene,'crease_threshold')
+
         props.MODE = context.scene.MODE
         props.turn_default_into_one_animatable_object = context.scene.turn_default_into_one_animatable_object
         props.add_subdivision = context.scene.add_subdivision
@@ -289,6 +293,8 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         
         props.frame_ons = context.scene.frame_ons    
 
+        props.crease_threshold = context.scene.crease_threshold
+
 class DATA_OT_GP_outliner(bpy.types.Operator):
     
     bl_idname = "data.grease_pencils_outliner"
@@ -296,7 +302,7 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
     bl_options = {'REGISTER','UNDO'}
 
     MODE: bpy.props.EnumProperty(items=[("DEFAULT","DEFAULT",""),("TRACE_1","TRACE_1",""),("TRACE_2","TRACE_2","")])
-            
+    
     turn_default_into_one_animatable_object: bpy.props.BoolProperty(
                                                     name="one animation",
                                                     description="This moves the animantion into one GP object so it can be animated",
@@ -395,7 +401,14 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
                             default=1,
                             min=1,
                             max=24)
-      
+
+    crease_threshold : bpy.props.FloatProperty(
+                                name="crease threshold",
+                                description="This adjustmed adds how many of the edges should have lines",
+                                default=0.0,
+                                min=0.0,
+                                max=3.14159) 
+
     @classmethod
     def poll(cls, context):   
         if bpy.context.scene.start_frame >= bpy.context.scene.end_frame:
@@ -416,7 +429,7 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
             lagg_effect_amount = self.lagg_effect_amount,fade_amount = self.fade_amount, subdivison_level = self.subdivison_level, stroke_thickness = self.stroke_thickness,
             stroke_opacity = self.stroke_opacity, start_frame = self.start_frame, end_frame = self.end_frame, output_collection = self.output_collection,
             R = self.red_color, B = self.blue_color, G = self.green_color, A = self.alpha_color,
-            frame_ons = self.frame_ons)
+            frame_ons = self.frame_ons, crease_threshold = self.crease_threshold)
         
             return {'FINISHED'}
         
@@ -524,6 +537,13 @@ def register():
                             default=1,
                             min=1,
                             max=24)
+
+    bpy.types.Scene.crease_threshold = bpy.props.FloatProperty(
+                                name="crease threshold",
+                                description="This adjustmed adds how many of the edges should have lines",
+                                default=0.0,
+                                min=0.0,
+                                max=3.14159)
                             
     bpy.utils.register_class(VIEW3D_PT_GP_Outliner)
     bpy.utils.register_class(DATA_OT_GP_outliner)
@@ -561,6 +581,8 @@ def unregister():
     del bpy.types.Scene.alpha_color 
     
     del bpy.types.Scene.frame_ons 
+
+    del bpy.types.Scene.crease_threshold
                             
     bpy.utils.unregister_class(VIEW3D_PT_GP_Outliner)
     bpy.utils.unregister_class(DATA_OT_GP_outliner)

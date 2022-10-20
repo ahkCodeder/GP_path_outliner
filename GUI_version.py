@@ -13,7 +13,7 @@ bl_info = {
 
 import bpy
 
-def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",R=0,B=0,G=0,A=0,frame_ons = 1,crease_threshold = 3.14159):
+def GP_outliner(MODE="DEFUALT",source_type="SCENE",collection_name="",object_name="",turn_default_into_one_animatable_object=False,add_subdivision = False,lagg_effect_amount = 1,fade_amount = 0.20, subdivison_level = 1, stroke_thickness = 20,stroke_opacity = 1,start_frame = 1,end_frame=30,output_collection = "g",R=0,B=0,G=0,A=0,frame_ons = 1,crease_threshold = 3.14159):
 
     # MOVES THE STROKES AWAY FROM THE VIEW PRORT IN ANIMATION 
     away_from_frame_distance = (0,0,10000000)
@@ -37,7 +37,16 @@ def GP_outliner(MODE="DEFUALT",turn_default_into_one_animatable_object=False,add
         target_material_name = D.objects[GP_obj].active_material.name
         
         bpy.ops.object.gpencil_modifier_add(type='GP_LINEART')
-        D.objects[GP_obj].grease_pencil_modifiers['Line Art'].source_type = 'SCENE'
+        D.objects[GP_obj].grease_pencil_modifiers['Line Art'].source_type = source_type
+
+        if source_type == "OBJECT": 
+
+             D.objects[GP_obj].grease_pencil_modifiers["Line Art"].source_object = bpy.data.objects[object_name]
+
+        elif source_type == "COLLECTION": 
+
+             D.objects[GP_obj].grease_pencil_modifiers["Line Art"].source_collection = bpy.data.collections[collection_name]
+
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].target_layer = "GP_Layer"
 
         D.objects[GP_obj].grease_pencil_modifiers["Line Art"].crease_threshold = crease_threshold
@@ -251,6 +260,15 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         col = self.layout.column(align=True)
         
         col.prop(context.scene,'MODE')
+
+        col.prop(context.scene,"source_type")
+
+        if(context.scene.source_type == "OBJECT"):
+            col.prop(context.scene,"object_name")
+        elif(context.scene.source_type == "COLLECTION"):
+            col.prop(context.scene,"collection_name")
+
+
         col.prop(context.scene,'output_collection')
         
         col.prop(context.scene,'turn_default_into_one_animatable_object')
@@ -273,6 +291,7 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         col.prop(context.scene,'crease_threshold')
 
         props.MODE = context.scene.MODE
+        props.source_type = context.scene.source_type
         props.turn_default_into_one_animatable_object = context.scene.turn_default_into_one_animatable_object
         props.add_subdivision = context.scene.add_subdivision
         props.subdivison_level = context.scene.subdivison_level
@@ -280,7 +299,9 @@ class VIEW3D_PT_GP_Outliner(bpy.types.Panel):
         props.fade_amount = context.scene.fade_amount
         props.stroke_thickness = context.scene.stroke_thickness
         props.stroke_opacity = context.scene.stroke_opacity
-        
+        props.collection_name = context.scene.collection_name
+        props.object_name = context.scene.object_name
+
         props.start_frame = context.scene.start_frame
         props.end_frame = context.scene.end_frame
         
@@ -303,6 +324,18 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
 
     MODE: bpy.props.EnumProperty(items=[("DEFAULT","DEFAULT",""),("TRACE_1","TRACE_1",""),("TRACE_2","TRACE_2","")])
     
+    source_type: bpy.props.EnumProperty(items=[("COLLECTION","COLLECTION",""),("SCENE","SCENE",""),("OBJECT","OBJECT","")])
+
+    collection_name: bpy.props.StringProperty(
+                                    name="name collection",
+                                    description="what collection you want line art to apply to",
+                                    default="")
+
+    object_name: bpy.props.StringProperty(
+                                    name="object name",
+                                    description="what object you want line art to apply to",
+                                    default="")
+
     turn_default_into_one_animatable_object: bpy.props.BoolProperty(
                                                     name="one animation",
                                                     description="This moves the animantion into one GP object so it can be animated",
@@ -402,7 +435,7 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
                             min=1,
                             max=24)
 
-    crease_threshold : bpy.props.FloatProperty(
+    crease_threshold: bpy.props.FloatProperty(
                                 name="crease threshold",
                                 description="This adjustmed adds how many of the edges should have lines",
                                 default=0.0,
@@ -429,7 +462,8 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
             lagg_effect_amount = self.lagg_effect_amount,fade_amount = self.fade_amount, subdivison_level = self.subdivison_level, stroke_thickness = self.stroke_thickness,
             stroke_opacity = self.stroke_opacity, start_frame = self.start_frame, end_frame = self.end_frame, output_collection = self.output_collection,
             R = self.red_color, B = self.blue_color, G = self.green_color, A = self.alpha_color,
-            frame_ons = self.frame_ons, crease_threshold = self.crease_threshold)
+            frame_ons = self.frame_ons, crease_threshold = self.crease_threshold,
+            source_type = self.source_type, collection_name = self.collection_name, object_name = self.object_name)
         
             return {'FINISHED'}
         
@@ -438,7 +472,19 @@ class DATA_OT_GP_outliner(bpy.types.Operator):
 def register():
     
     bpy.types.Scene.MODE = bpy.props.EnumProperty(items=[("DEFAULT","DEFAULT",""),("TRACE_1","TRACE_1",""),("TRACE_2","TRACE_2","")])
-            
+    
+    bpy.types.Scene.source_type = bpy.props.EnumProperty(items=[("COLLECTION","COLLECTION",""),("SCENE","SCENE",""),("OBJECT","OBJECT","")])
+    
+    bpy.types.Scene.collection_name = bpy.props.StringProperty(
+                                    name="name collection",
+                                    description="what collection you want line art to apply to",
+                                    default="")
+
+    bpy.types.Scene.object_name =  bpy.props.StringProperty(
+                                    name="object name",
+                                    description="what object you want line art to apply to",
+                                    default="")
+
     bpy.types.Scene.turn_default_into_one_animatable_object = bpy.props.BoolProperty(
                                                     name="one animation",
                                                     description="This moves the animantion into one GP object so it can be animated",
@@ -552,6 +598,12 @@ def unregister():
     
     del bpy.types.Scene.MODE 
             
+    del bpy.types.Scene.source_type
+
+    del bpy.types.Scene.collection_name
+
+    del bpy.types.Scene.object_name 
+
     del bpy.types.Scene.turn_default_into_one_animatable_object 
     
     del bpy.types.Scene.add_subdivision 
